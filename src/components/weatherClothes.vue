@@ -239,7 +239,7 @@ const analizeClothesByBase64 = async (code)=> {
     const raw = response.data.response;
     let onlyAssistant = raw;
 
-    if (raw.includes('Assistant:')) { // 
+    if (raw.includes('Assistant:')) { // LLM 답문 자르기
       onlyAssistant = raw.split('Assistant:').pop().trim();
     }else {
      onlyAssistant = raw.trim();
@@ -251,8 +251,6 @@ const analizeClothesByBase64 = async (code)=> {
     }
 
     // reportBase64.value = onlyAssistant;
-
-   
     // const onlyAssistant = raw.split('Assistant:')[1]?.trim();
     console.log("onlyAssistant : ", onlyAssistant);
     reportBase64.value = onlyAssistant;
@@ -267,7 +265,6 @@ const analizeClothesByBase64 = async (code)=> {
   }
 
   try {
-    
     const response = await axios.post('/translate', {
       text: reportBase64.value,
       source : 'en',
@@ -280,11 +277,11 @@ const analizeClothesByBase64 = async (code)=> {
     console.log(error);
   }
 
-}
+}// End of analizeClothesByBase64
 
 const searchClothes = (description) => {
-  const h3Element = document.querySelector('#detailH3');
-  const query = encodeURIComponent(description);
+  const h3Element = document.querySelector('#detailH3');// 디테일 설명 h3 태그
+  const query = encodeURIComponent(description);// 번역전 영어원문의 첫줄을 받아와서 쿼리문자열으로 인코딩
   const url = `https://www.google.com/search?tbm=isch&q=Musinsa:${query}`;
   // window.open(url, "_blank");
   const existingLink = h3Element.querySelector('a'); // h3의 자식노드의 a태그 존재확인

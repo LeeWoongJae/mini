@@ -219,7 +219,7 @@ const resetGame = async () => {
   // elapsedTime.value = 0
   speed10s.value = 0
   isReadonly.value = false;
-
+  showRetryBtn.value = false;
   await generateImage(); // 랜덤 보스 생성
   // gameStore.setupBoss(); // 새로운 보스 HP 세팅
 }
@@ -280,10 +280,22 @@ const onKeydown = (e) => {
     }
 
     if(gameStore.boss.currentHp <= 0){
+      const displayTime = elapsedTime.value < 60 ? `${elapsedTime.value}s` : `${Math.floor(elapsedTime.value / 60)}min`;
+      gameStore.addRecordToHall({user:'Annoymous', monster:fullName.value, clearTime: displayTime, lang: gameStore.language, mode:gameStore.mode+"-"+gameStore.difficulty});
+      console.log(gameStore.hallOfFame);
       const reJoin = confirm('Mission Complete!\nCongratuations');
       if(reJoin){
         resetGame();
          return; // 게임 리셋 후 바로 리턴
+      }
+      else{
+        gameTimerReset()
+        currentIndex.value = 0
+        inputText.value = ''
+        speed10s.value = 0
+        isReadonly.value = false;
+        alert('메인화면으로 되돌아 갑니다.');
+        router.push('/sample');
       }
     }
 
@@ -303,7 +315,7 @@ const onKeydown = (e) => {
 
     // 텍스트 초기화 + 커서 재배치
     inputText.value = ''
-    inputEl.value.focus()
+    inputEl.value?.focus()
 
     // 타이머 초기화
     // gameTimerReset()

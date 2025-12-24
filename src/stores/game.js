@@ -10,7 +10,8 @@ export const useGameStore = defineStore('game', {
       type: 'goblin',
       maxHp: 100,
       currentHp: 100
-    }
+    },
+    hallOfFame:[]// 명예의 전당
   }),
   actions: {
     // setupBoss() {
@@ -115,5 +116,14 @@ export const useGameStore = defineStore('game', {
         0
       )
     },
+    // 명예의 전당 추가
+    addRecordToHall(record) {
+      this.hallOfFame.push(record)
+      if(this.hallOfFame.length > 15) this.hallOfFame.shift() // 최대 15개
+    },
+    clearHallOfFame() {
+      this.hallOfFame = [],
+      localStorage.removeItem('hallOfFame')
+    }
   }
 })
