@@ -11,7 +11,7 @@ export const useGameStore = defineStore('game', {
       maxHp: 100,
       currentHp: 100
     },
-    hallOfFame:[]// 명예의 전당
+    hallOfFame:JSON.parse(localStorage.getItem('hallOfFame')) || []// 명예의 전당
   }),
   actions: {
     // setupBoss() {
@@ -120,6 +120,7 @@ export const useGameStore = defineStore('game', {
     addRecordToHall(record) {
       this.hallOfFame.push(record)
       if(this.hallOfFame.length > 15) this.hallOfFame.shift() // 최대 15개
+      localStorage.setItem('hallOfFame', JSON.stringify(this.hallOfFame))
     },
     clearHallOfFame() {
       this.hallOfFame = [],

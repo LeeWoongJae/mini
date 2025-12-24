@@ -106,7 +106,7 @@ const loopedHall = computed(() => [...game.hallOfFame, ...game.hallOfFame])
     transform: translateY(0);
   }
   100% {
-    transform: translateY(-50%); /* 리스트 절반 길이만큼 이동 */
+    transform: translateY(-100%); /* 리스트 길이만큼 이동 */
   }
 }
 </style>
