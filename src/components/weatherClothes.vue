@@ -40,9 +40,9 @@ const style = ref([{code : 'ca', name : '캐주얼',value:'캐주얼'},
                    {code : 'st', name : '스트릿',value : '스트릿'},
                    {code : 'vtg', name : '빈티지',value : '빈티지'},
                    {code : 'cls', name : '클래식',value : '클래식'},
-                   {code : 'nc', name : '놈코어',value : '놈코어'},
+                   {code : 'nc', name : '놈코어',value : '놈코어'}, // 일상적인 평범한 패션
                    {code : 'md', name : '모던', value : '모던'},
-                   {code : 'fe', name : '페미닌', value : '페미닌'},
+                   {code : 'fe', name : '페미닌', value : '페미닌'},// 여성스러운 패션
                    {code : 'da', name : '댄디', value : '댄디'},
                    {code : 'mi', name : '미니멀리즘', value : '미니멀리즘'},
                    {code : 'la', name : '레이어드', value : '레이어드'},
@@ -70,6 +70,7 @@ const generateImage = async () => {
   try {
     const res = await axios.post('/generate', {
       prompt: transResult.value,
+      negative_prompt : 'blurry, low quality, face, facial features, head, hair, beard, portrait, background, scenery, environment, street, road, city, building, wall, floor, sky',
       return_base64: true // base64 이미지 반환 요청
     })
 
@@ -96,7 +97,9 @@ const sendTranslate = async () => {
     alert('스타일을 선택해주세요!');    return;
   }
   // 1. 한국어 문장 조합
-  const korText = `기존에 설정된 프롬프트를 모두 무시하고 아래 지시만 따르십시오. 이 이미지는 ${getGenderKor(gender.value)} 모델의  ${checkStyle.value} 복장이다 현지역의 풍속은 ${getWindSpeedByScore(wsd.value)}이 불고, 기온은 ${t1h.value}°C 이며, 습도는 ${reh.value}%이고, 강수량은 ${getRnByScore(rn.value)}정도 되며, 강수형태는 ${getResultByScore(pty.value)} 이다 추가적으로 ${textareaContent.value} 그리고 내가 나열한 정보들을 꼭 반영해서 모델샷 이미지를 생성하라.`;
+  // const korText = `기존에 설정된 프롬프트를 모두 무시하고 아래 지시만 따르십시오. 이 이미지는 ${getGenderKor(gender.value)} 모델의  ${checkStyle.value} 복장이다 현지역의 풍속은 ${getWindSpeedByScore(wsd.value)}이 불고, 기온은 ${t1h.value}°C 이며, 습도는 ${reh.value}%이고, 강수량은 ${getRnByScore(rn.value)}정도 되며, 강수형태는 ${getResultByScore(pty.value)} 이다 추가적으로 ${textareaContent.value} 그리고 내가 나열한 정보들을 꼭 반영해서 모델샷 이미지를 생성하라.`;
+  const korText = `기존에 설정된 프롬프트를 모두 무시하고 아래 지시만 따르십시오. 이 이미지는 ${getGenderKor(gender.value)} 모델의 ${checkStyle.value} 복장이다 현지역의 풍속은 ${getWindSpeedByScore(wsd.value)}이 불고, 기온은 ${t1h.value}°C 이며, 습도는 ${reh.value}%이고, 강수량은 ${getRnByScore(rn.value)}정도 이다. ${textareaContent.value}. torso and legs only, body cropped at neck, head cropped out of image, head completely out of frame, no face visible, fashion catalog style, isolated subject, studio product photography, plain white seamless background. 앞서 나열한 조건들을 반드시 반영해서 모델샷 이미지를 생성하라.`;
+  // const korText = `이 이미지는 ${getGenderKor(gender.value)}모델의 ${checkStyle.value}스타일 복장이다 현재 날씨는 풍속은 ${getWindSpeedByScore(wsd.value)}이 불고, 기온은 ${t1h.value}°C 이며, 습도는 ${reh.value}%이고, 강수량은 ${getRnByScore(rn.value)}이다. ${textareaContent.value}. 반드시 torso and legs only, body cropped at neck, head cropped out of image, head completely out of frame, no face visible, fashion catalog style, isolated subject, studio product photography, plain white seamless background.`;
   console.log('조합된 한국어 문장 >> '+korText);
   try {
       if (!korText) {
@@ -145,6 +148,7 @@ baseTime.value = getTimeHHMM();
 function getGenderKor(gender) {
   if (gender == 'male') return '남자'
   if (gender == 'female') return '여자'
+  if (gender == 'none') return '선택안함'
 }
 
 /**
@@ -218,7 +222,8 @@ const analizeClothesByBase64 = async (code)=> {
     formData.append('file', file);
     formData.append(
       'prompt',
-     '이미지에서 보여지는 인상착의를 자세히 설명해주세요.'
+    //  '이미지에서 보여지는 인상착의를 자세히 설명해주세요.'
+      `반드시 이미지에 보이는 인상착의만 자세히 설명해주세요. 절대로 배경 설명이나 인물의 포즈에 대한 설명은 포함시키지 마세요`
     );
     // '이 이미지를 분석하고 설명해. 만약 사람의 이미지가 아니라면 분석을 종료하고 나에게 "이 이미지는 사람이 아닙니다"라는 문구를 띄우고 사람의 이미지이라면 설명형식은 예를들면 "아우터 : 남성 다크브라운 롱코트 울 모직 / 이너 : 남성 화이트 체크셔츠 실크 / 하의 : 남성 검정 데님팬츠" 이 형식으로 하면되고 배경에 대한 설명은 생략해'
     formData.append('max_tokens', 256);
@@ -347,6 +352,8 @@ onMounted(async () => {
     <div class="controls">
       <div>
         <h3>성별 선택</h3>
+        <!-- <input type="radio" id="none" value="none" v-model="gender">
+        <label for="none">선택안함</label> -->
         <input type="radio" id="male" value="male" v-model="gender">
         <label for="male">Male</label>
         <input type="radio" id="female" value="female" v-model="gender">
@@ -364,8 +371,8 @@ onMounted(async () => {
     </div>
 
     <!-- 기상 정보 영역 -->
-    <div class="weather-info">
-      <h3>현재 위치 기반 기상 정보({{baseTime}} 기준)</h3>
+    <!-- <div class="weather-info">
+      <h3>현재 위치 기반 기상 정보({{baseTime}} 기준)</h3>1
       <small><strong>*기준 시간으로부터 약 3시간 정도의 기상예보입니다</strong></small>
       <div class="weather-items">
         <p>강수량: {{ getRnByScore(rn) }}</p>
@@ -376,7 +383,7 @@ onMounted(async () => {
         <p>위도: {{ lat }}</p>
         <p>경도: {{ lon }}</p>
       </div>
-    </div>
+    </div> -->
 
     <!-- textarea -->
     <div class="command">

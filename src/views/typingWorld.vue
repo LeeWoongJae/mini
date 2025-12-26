@@ -369,6 +369,7 @@ const generateImage = async () => {
   try {
     const res = await axios.post('/generate', {
       prompt: prompt,
+      negative_prompt : 'blurry, low quality,multiple people, group, crowd,extra limbs, duplicate face',
       width : 480,
       height : 240,
       return_base64: true // base64 이미지 반환 요청
