@@ -1,5 +1,38 @@
-# Vue 3 + Vite
+# 프로젝트 기간
+- 2025. 12. 12 ~ 2025. 12. 26
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+# 프로젝트 투입인원
+- 1명
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+# 프로젝트 담당자
+- LeeWoongJae
+
+# 프로젝트 주제 
+- 위치정보 기준 기상정보를 가져와 선호하는 스타일과 성별에 맞게 데일리 룩을 추천받고
+  유사한 착상정보를 검색한 결과를 링크로 주는 사이트
+
+# 프로젝트 목적
+- 위치 기반 날씨 정보와 사용자 선호도를 결합해 실생활에 바로 활용 가능한 데일리 코디 추천 경험 제공
+
+# 주요 기능
+- 위치 기반 날씨 정보 조회
+- 성별 및 스타일 선호도 기반 데일리 룩 추천
+- 추천 룩에 대한 유사 상품 검색 결과 제공
+
+# 추가 기능
+- 타이핑 게임 요소를 추가해 사용자의 긴장감 해소 및 사이트 친근감 향상
+
+# 기술 스택 및 설계
+- Vue 3 + Vite 기반 SPA 구성
+- Pinia를 사용해 전역 상태 관리
+- LocalStorage를 활용해 사용자 설정 및 기록 영속화
+- navigator API를 통해 브라우저 기준 위치 정보 획득
+- 초단기예보조회 API를 활용한 실시간 기상 정보 조회
+
+## 향후 개선 사항
+- 이미지 검색 결과의 링크를 유사한 제품의 구매사이트 링크 연결,
+  추천 → 탐색 → 구매로 이어지는 사용자 흐름을 강화할 예정
+- 타이핑 게임에 승리/패배 상태를 명확히 구분하고,
+  이미지와 설명 문구를 추가해 몰입도를 높일 예정
+- CSS 및 Template 구조를 정리하여 레이아웃 일관성과 반응형 UI를 개선하고
+  사용자 경험 중심의 화면 구성을 강화할 예정

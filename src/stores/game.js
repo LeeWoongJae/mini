@@ -4,8 +4,8 @@ export const useGameStore = defineStore('game', {
     language : 'ko',
     mode: 'single',
     difficulty: 'normal',
-    timeLimit: 100,
-    critical: 0.5,
+    timeLimit: 120,
+    critical: 0.3,
     boss: {
       type: 'goblin',
       maxHp: 100,
