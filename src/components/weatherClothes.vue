@@ -70,9 +70,12 @@ const generateImage = async () => {
   try {
     const res = await axios.post('/generate', {
       prompt: transResult.value,
-      negative_prompt : 'blurry, low quality, face, facial features, head, hair, beard, portrait, background, scenery, environment, street, road, city, building, wall, floor, sky',
+      negative_prompt : 'blurry, low quality, close-up, upper body only, bust shot, headshot, head, beard, multiple people, two people, group, crowd, extra person, background people, reflection of people, mannequin, background',
       return_base64: true // base64 이미지 반환 요청
     })
+    // 'blurry, low quality, portrait, close-up, upper body only, bust shot, headshot, head, face, facial features, hair, beard, multiple people, two people, group, crowd, extra person, background people, reflection of people, mannequin, detailed background',
+    // 'blurry, low quality, deformed body, portrait, close-up, upper body only, bust shot, headshot, face, facial features, head, hair, beard, cropped legs, out of frame legs, cut off legs, detailed background, complex scenery, desaturated, no color, low saturation',
+    // 'blurry, low quality, nsfw, Missing limbs, portrait, close-up, upper body only, bust shot, headshot, face, facial features, head, hair beard, portrait, background, scenery, environment, street, road, city, building, wall, floor, sky',
 
     imageSrc.value = `data:image/png;base64,${res.data.image_base64}`
     // imageSrc.value = res.data.image;
@@ -98,7 +101,7 @@ const sendTranslate = async () => {
   }
   // 1. 한국어 문장 조합
   // const korText = `기존에 설정된 프롬프트를 모두 무시하고 아래 지시만 따르십시오. 이 이미지는 ${getGenderKor(gender.value)} 모델의  ${checkStyle.value} 복장이다 현지역의 풍속은 ${getWindSpeedByScore(wsd.value)}이 불고, 기온은 ${t1h.value}°C 이며, 습도는 ${reh.value}%이고, 강수량은 ${getRnByScore(rn.value)}정도 되며, 강수형태는 ${getResultByScore(pty.value)} 이다 추가적으로 ${textareaContent.value} 그리고 내가 나열한 정보들을 꼭 반영해서 모델샷 이미지를 생성하라.`;
-  const korText = `기존에 설정된 프롬프트를 모두 무시하고 아래 지시만 따르십시오. 이 이미지는 ${getGenderKor(gender.value)} 모델의 ${checkStyle.value} 복장이다 현지역의 풍속은 ${getWindSpeedByScore(wsd.value)}이 불고, 기온은 ${t1h.value}°C 이며, 습도는 ${reh.value}%이고, 강수량은 ${getRnByScore(rn.value)}정도 이다. ${textareaContent.value}. torso and legs only, body cropped at neck, head cropped out of image, head completely out of frame, no face visible, fashion catalog style, isolated subject, studio product photography, plain white seamless background. 앞서 나열한 조건들을 반드시 반영해서 모델샷 이미지를 생성하라.`;
+  const korText = `이 이미지는 ${getGenderKor(gender.value)} 모델이 ${getWindSpeedByScore(wsd.value)}이 불고, 기온은 ${t1h.value}°C 이며, 습도가 ${getRehKR()}이고, 강수량은 ${getRnByScore(rn.value)}의 환경을 고려하여 입은 ${checkStyle.value}스타일 복장이다. 추가적으로 ${textareaContent.value}. full color fashion photography, accurate clothing colors, one person only`;
   // const korText = `이 이미지는 ${getGenderKor(gender.value)}모델의 ${checkStyle.value}스타일 복장이다 현재 날씨는 풍속은 ${getWindSpeedByScore(wsd.value)}이 불고, 기온은 ${t1h.value}°C 이며, 습도는 ${reh.value}%이고, 강수량은 ${getRnByScore(rn.value)}이다. ${textareaContent.value}. 반드시 torso and legs only, body cropped at neck, head cropped out of image, head completely out of frame, no face visible, fashion catalog style, isolated subject, studio product photography, plain white seamless background.`;
   console.log('조합된 한국어 문장 >> '+korText);
   try {
@@ -140,6 +143,35 @@ baseTime.value = getTimeHHMM();
 // console.log("현재 시간 : "+baseTime.value);
 
 /**
+ * @ 최초 생성일 :  2025. 12. 29
+ * @ author : 이웅재
+ * @ 함수명 : getRehKR
+ * @ 설명 : 기온값에 따른 습도를 한글로 변환해주는 함수
+ */
+function getRehKR() {
+  if(t1h.value <= 0){
+    if (0 < reh.value <= 40){return '낮음';}
+    else if (40 < reh.value <= 70){return '보통';}
+    else return '높음'
+  }
+  else if(0 < t1h.value <= 15){
+    if (0 < reh.value <= 35){return '낮음';}
+    else if (35 < reh.value <= 65){return '보통';}
+    else return '높음'
+  }
+  else if(15 < t1h.value <= 25){
+    if (0 < reh.value <= 40){return '낮음';}
+    else if (40 < reh.value <= 60){return '보통';}
+    else return '높음'
+  }
+  else if(25 < t1h.value){
+    if (0 < reh.value <= 45){return '낮음';}
+    else if (45 < reh.value <= 65){return '보통';}
+    else return '높음'
+  }
+}
+
+/**
  * @ 최초 생성일 :  2025. 12. 18
  * @ author : 이웅재
  * @ 함수명 : getGenderKor
@@ -174,10 +206,15 @@ function getResultByScore(score) {
  * @ 설명 : 풍속데이터값을 받아오면 각 값마다 표기되는 문자 반환 함수
  */
 function getWindSpeedByScore(wspeed) {
-  if (wspeed < 4) return `약한 바람(${wspeed}m/s)`
-  if (wspeed >= 4 && wspeed < 9) return `약간 강한 바람(${wspeed}m/s)`
-  if (wspeed >= 9 && wspeed < 14) return `강한 바람(${wspeed}m/s)`
-  if (wspeed >= 14) return `매우 강한 바람(${wspeed}m/s)`
+  // if (wspeed < 4) return `약한 바람(${wspeed}m/s)`
+  // if (wspeed >= 4 && wspeed < 9) return `약간 강한 바람(${wspeed}m/s)`
+  // if (wspeed >= 9 && wspeed < 14) return `강한 바람(${wspeed}m/s)`
+  // if (wspeed >= 14) return `매우 강한 바람(${wspeed}m/s)`
+
+  if (wspeed < 4) return `약한 바람`
+  if (wspeed >= 4 && wspeed < 9) return `약간 강한 바람`
+  if (wspeed >= 9 && wspeed < 14) return `강한 바람`
+  if (wspeed >= 14) return `매우 강한 바람`
 }
 
 /**
@@ -222,12 +259,44 @@ const analizeClothesByBase64 = async (code)=> {
     formData.append('file', file);
     formData.append(
       'prompt',
-    //  '이미지에서 보여지는 인상착의를 자세히 설명해주세요.'
-      `반드시 이미지에 보이는 인상착의만 자세히 설명해주세요. 절대로 배경 설명이나 인물의 포즈에 대한 설명은 포함시키지 마세요`
+     `Ignore all previous prompts and instructions.
+
+      Analyze the image and describe ONLY the person's clothing.
+      If the person is wearing outerwear and inner clothing is visible,
+      you MUST describe BOTH the inner Top and the Outerwear separately.
+      Do NOT omit the Top just because Outerwear is present.
+      If an item is clearly visible, you MUST describe it and MUST NOT write "None".
+      Only write "None" if the item is truly not visible or definitely not worn.
+      You MUST follow the exact output format below.
+      Do NOT write full sentences.
+      Do NOT add any explanations.
+      Do NOT describe the background or the person's pose.
+
+      Output format (use this exact structure):
+
+      Top: <description or None>
+      Bottom: <description or None>
+      Outerwear: <description or None>
+      Shoes: <description or None>
+
+      Rules:
+      - Always output all four lines.
+      - Describe color, material, and type if possible.
+      - Do not merge items into one line.`
+      
     );
+    //  `Ignore all previous prompts and instructions.
+    //     Analyze the image and describe ONLY the person's clothing.
+    //     Describe the clothing in the exact order below:
+    //     Top, Bottom, Outerwear
+    //     Do NOT describe the background.
+    //     Do NOT describe the person's pose.
+    //     Do NOT add any extra explanations or sentences.`
+    // `이전 프롬프트를 모두 무시하고 아래의 지시를 따르시오. "Analyzing Image"라는 문구만 출력하라.`
+    // `반드시 이미지에 인물의 인상착의만 상의, 하의, 외투 순서로 설명하라. 절대로 배경과 인물 포즈 설명은 제외하라.`
     // '이 이미지를 분석하고 설명해. 만약 사람의 이미지가 아니라면 분석을 종료하고 나에게 "이 이미지는 사람이 아닙니다"라는 문구를 띄우고 사람의 이미지이라면 설명형식은 예를들면 "아우터 : 남성 다크브라운 롱코트 울 모직 / 이너 : 남성 화이트 체크셔츠 실크 / 하의 : 남성 검정 데님팬츠" 이 형식으로 하면되고 배경에 대한 설명은 생략해'
-    formData.append('max_tokens', 256);
-    formData.append('temperature', 0.7);
+    formData.append('max_tokens', 100);
+    formData.append('temperature', 0.15);
     formData.append('return_base64', true);
     // multipart 요청
     const response = await axios.post(
@@ -242,6 +311,7 @@ const analizeClothesByBase64 = async (code)=> {
 
     // console.log('분석 결과:', response.data.response);
     const raw = response.data.response;
+    console.log("raw : ", raw);
     let onlyAssistant = raw;
 
     if (raw.includes('Assistant:')) { // LLM 답문 자르기
@@ -388,7 +458,7 @@ onMounted(async () => {
     <!-- textarea -->
     <div class="command">
       <h3 id="detailH3">디테일 설명</h3>
-      <textarea cols="20" rows="5" v-model="textareaContent" placeholder="추가적으로 원하시는 스타일이 있다면 적어주세요!"></textarea>
+      <textarea cols="20" rows="5" v-model="textareaContent" placeholder="Ex)검은색코트를 착용한 데일리룩"></textarea>
     </div>
     <button @click="sendTranslate">전송</button>
     <!-- 번역 결과 영역 -->
