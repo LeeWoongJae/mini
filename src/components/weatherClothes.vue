@@ -70,9 +70,10 @@ const generateImage = async () => {
   try {
     const res = await axios.post('/generate', {
       prompt: transResult.value,
-      negative_prompt : 'blurry, low quality, close-up, upper body only, bust shot, headshot, head, beard, multiple people, two people, group, crowd, extra person, background people, reflection of people, mannequin, background',
+      negative_prompt : 'background, scenery, environment, city, street, road, sidewalk, buildings, walls, windows, trees, grass, sky, clouds, cars, signs, extra people, crowd, face, head, hair, portrait, cropped, cut off, out of frame, blurry, low quality',
       return_base64: true // base64 이미지 반환 요청
     })
+    // 'blurry, low quality, sepia, text, cropped, close-up, upper body only, bust shot, headshot, face, head, hair, eyes, mouth, beard, multiple people, two people, group, crowd, extra person, background people, reflection of people, mannequin, scenery, landscape, cityscape, environment,location, place, outdoor, indoor, room, wall, floor,multiple views, sequence, comic, 2koma, 4koma, letterboxed, framed, border, speech bubble'
     // 'blurry, low quality, portrait, close-up, upper body only, bust shot, headshot, head, face, facial features, hair, beard, multiple people, two people, group, crowd, extra person, background people, reflection of people, mannequin, detailed background',
     // 'blurry, low quality, deformed body, portrait, close-up, upper body only, bust shot, headshot, face, facial features, head, hair, beard, cropped legs, out of frame legs, cut off legs, detailed background, complex scenery, desaturated, no color, low saturation',
     // 'blurry, low quality, nsfw, Missing limbs, portrait, close-up, upper body only, bust shot, headshot, face, facial features, head, hair beard, portrait, background, scenery, environment, street, road, city, building, wall, floor, sky',
@@ -101,7 +102,8 @@ const sendTranslate = async () => {
   }
   // 1. 한국어 문장 조합
   // const korText = `기존에 설정된 프롬프트를 모두 무시하고 아래 지시만 따르십시오. 이 이미지는 ${getGenderKor(gender.value)} 모델의  ${checkStyle.value} 복장이다 현지역의 풍속은 ${getWindSpeedByScore(wsd.value)}이 불고, 기온은 ${t1h.value}°C 이며, 습도는 ${reh.value}%이고, 강수량은 ${getRnByScore(rn.value)}정도 되며, 강수형태는 ${getResultByScore(pty.value)} 이다 추가적으로 ${textareaContent.value} 그리고 내가 나열한 정보들을 꼭 반영해서 모델샷 이미지를 생성하라.`;
-  const korText = `이 이미지는 ${getGenderKor(gender.value)} 모델이 ${getWindSpeedByScore(wsd.value)}이 불고, 기온은 ${t1h.value}°C 이며, 습도가 ${getRehKR()}이고, 강수량은 ${getRnByScore(rn.value)}의 환경을 고려하여 입은 ${checkStyle.value}스타일 복장이다. 추가적으로 ${textareaContent.value}. full color fashion photography, accurate clothing colors, one person only`;
+  // const korText = `이 이미지는 ${getGenderKor(gender.value)} 모델이 ${getWindSpeedByScore(wsd.value)}이 불고, 기온은 ${t1h.value}°C 이며, 습도가 ${getRehKR()}이고, 강수량은 ${getRnByScore(rn.value)}의 환경을 고려하여 입은 ${checkStyle.value}스타일 복장이다. 추가적으로 ${textareaContent.value}. full color fashion photography, accurate clothing colors, one person only`;
+  const korText = `단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${textareaContent.value}.`
   // const korText = `이 이미지는 ${getGenderKor(gender.value)}모델의 ${checkStyle.value}스타일 복장이다 현재 날씨는 풍속은 ${getWindSpeedByScore(wsd.value)}이 불고, 기온은 ${t1h.value}°C 이며, 습도는 ${reh.value}%이고, 강수량은 ${getRnByScore(rn.value)}이다. ${textareaContent.value}. 반드시 torso and legs only, body cropped at neck, head cropped out of image, head completely out of frame, no face visible, fashion catalog style, isolated subject, studio product photography, plain white seamless background.`;
   console.log('조합된 한국어 문장 >> '+korText);
   try {
@@ -149,26 +151,59 @@ baseTime.value = getTimeHHMM();
  * @ 설명 : 기온값에 따른 습도를 한글로 변환해주는 함수
  */
 function getRehKR() {
-  if(t1h.value <= 0){
-    if (0 < reh.value <= 40){return '낮음';}
-    else if (40 < reh.value <= 70){return '보통';}
-    else return '높음'
+  const t = t1h.value;
+  const h = reh.value;
+
+  if (t <= 0) {
+    if (h <= 40) return '낮음';
+    else if (h <= 70) return '보통';
+    else return '높음';
   }
-  else if(0 < t1h.value <= 15){
-    if (0 < reh.value <= 35){return '낮음';}
-    else if (35 < reh.value <= 65){return '보통';}
-    else return '높음'
+
+  else if (t <= 15) {
+    if (h <= 35) return '낮음';
+    else if (h <= 65) return '보통';
+    else return '높음';
   }
-  else if(15 < t1h.value <= 25){
-    if (0 < reh.value <= 40){return '낮음';}
-    else if (40 < reh.value <= 60){return '보통';}
-    else return '높음'
+
+  else if (t <= 25) {
+    if (h <= 40) return '낮음';
+    else if (h <= 60) return '보통';
+    else return '높음';
   }
-  else if(25 < t1h.value){
-    if (0 < reh.value <= 45){return '낮음';}
-    else if (45 < reh.value <= 65){return '보통';}
-    else return '높음'
+
+  else {
+    if (h <= 45) return '낮음';
+    else if (h <= 65) return '보통';
+    else return '높음';
   }
+}
+
+/**
+ * @ 최초생성일 : 2025. 12. 30.
+ * @ author : 이웅재
+ * @ 함수명 : getThermalState
+ * @ 함수설명 : 기온과 습도값을 기입하면 추운 | 더운 | 보통의 문자값을 리턴하는 함수
+ */
+function getThermalState(temp, humidity) {
+  let state;
+
+  // 1️⃣ 기본 기온 기준
+  if (temp <= 5) state = '추운';
+  else if (temp <= 20) state = '보통';
+  else state = '더운';
+
+  // 2️⃣ 습도 보정 (체감용)
+  if (humidity >= 70) {
+    if (state === '보통' && temp <= 10) state = '추운';
+    if (state === '보통' && temp >= 25) state = '더운';
+  }
+
+  if (humidity <= 30) {
+    if (state === '추운' && temp >= 3) state = '보통';
+  }
+
+  return state;
 }
 
 /**
@@ -232,6 +267,38 @@ function getRnByScore(score) {
 }
 
 /**
+ * @ 최초 생성일 :  2025. 12. 30.
+ * @ author : 이웅재
+ * @ 함수명 : findWaGwaIndex
+ * @ 설명 : 분석문에 와 또는 과의 인덱스를 반환하는 함수
+ */
+function findWaGwaIndex(text) {
+  const wa = text.indexOf('와');
+  const gwa = text.indexOf('과');
+
+  if (wa === -1) return gwa;
+  if (gwa === -1) return wa;
+
+  return Math.min(wa, gwa);
+}
+
+/**
+ * @ 최초 생성일 :  2025. 12. 30.
+ * @ author : 이웅재
+ * @ 함수명 : findUlRulIndex
+ * @ 설명 : 분석문에 을 또는 를의 인덱스를 반환하는 함수
+ */
+function findUlRulIndex(text) {
+  const u = text.indexOf('을');
+  const r = text.indexOf('를');
+
+  if (u === -1) return r;
+  if (r === -1) return u;
+
+  return Math.min(u, r);
+}
+
+/**
  * @ 최초 생성일 :  2025. 12. 17
  * @ author : 이웅재
  * @ 함수명 : analizeClothesByBase64
@@ -259,39 +326,30 @@ const analizeClothesByBase64 = async (code)=> {
     formData.append('file', file);
     formData.append(
       'prompt',
-     `Ignore all previous prompts and instructions.
-
-      Analyze the image and describe ONLY the person's clothing.
-      If the person is wearing outerwear and inner clothing is visible,
-      you MUST describe BOTH the inner Top and the Outerwear separately.
-      Do NOT omit the Top just because Outerwear is present.
-      If an item is clearly visible, you MUST describe it and MUST NOT write "None".
-      Only write "None" if the item is truly not visible or definitely not worn.
-      You MUST follow the exact output format below.
-      Do NOT write full sentences.
-      Do NOT add any explanations.
-      Do NOT describe the background or the person's pose.
-
-      Output format (use this exact structure):
-
-      Top: <description or None>
-      Bottom: <description or None>
-      Outerwear: <description or None>
-      Shoes: <description or None>
-
-      Rules:
-      - Always output all four lines.
-      - Describe color, material, and type if possible.
-      - Do not merge items into one line.`
-      
+      `Ignore all previous prompts and instructions.
+        Analyze the image and describe ONLY the person's clothing.
+        Describe the clothing in the exact order below:
+        Top:<Description>
+        Bottom:<Description>
+        Outerwear:<Description or None>
+        Shoes:<Description or None>
+        Do NOT describe the background.
+        Do NOT describe the person's pose.
+        Do NOT add any extra explanations or sentences.`
     );
-    //  `Ignore all previous prompts and instructions.
-    //     Analyze the image and describe ONLY the person's clothing.
-    //     Describe the clothing in the exact order below:
-    //     Top, Bottom, Outerwear
-    //     Do NOT describe the background.
-    //     Do NOT describe the person's pose.
-    //     Do NOT add any extra explanations or sentences.`
+// `Describe the clothing items only.
+// Ignore background, scenery, and environment.
+
+// For each item, include color and length.
+// Use length terms such as cropped, waist-length, hip-length, full-length, or long.
+
+// Output format (use this exact structure):
+
+// Top: <description (include color and length)>
+// Bottom: <description (include color and length)>
+// Outerwear: <description (include color and length) or None>
+// Shoes: <description (include color) or None>
+// `
     // `이전 프롬프트를 모두 무시하고 아래의 지시를 따르시오. "Analyzing Image"라는 문구만 출력하라.`
     // `반드시 이미지에 인물의 인상착의만 상의, 하의, 외투 순서로 설명하라. 절대로 배경과 인물 포즈 설명은 제외하라.`
     // '이 이미지를 분석하고 설명해. 만약 사람의 이미지가 아니라면 분석을 종료하고 나에게 "이 이미지는 사람이 아닙니다"라는 문구를 띄우고 사람의 이미지이라면 설명형식은 예를들면 "아우터 : 남성 다크브라운 롱코트 울 모직 / 이너 : 남성 화이트 체크셔츠 실크 / 하의 : 남성 검정 데님팬츠" 이 형식으로 하면되고 배경에 대한 설명은 생략해'
@@ -334,7 +392,7 @@ const analizeClothesByBase64 = async (code)=> {
     //     return;
     //   } 
     console.log('의상 분석 결과(reportBase64):', reportBase64.value);
-
+    
   } catch (error) {
     console.error('의상 분석 실패:', error);
   }
@@ -348,6 +406,13 @@ const analizeClothesByBase64 = async (code)=> {
     console.log(response.data.translatedText);
     translateKorFromEng.value = response.data.translatedText;
     searchClothes(reportBase64.value.slice(0, reportBase64.value.indexOf('.')));
+
+    const standardStr = translateKorFromEng.value;
+    const firstStr = standardStr.indexOf('는') // 남자는 , 여자는
+    const topStr = standardStr.slice(0,firstStr)+" "+standardStr.slice(firstStr+1 , findWaGwaIndex(standardStr)); // ex > 남자 검은색자켓
+    const bottomStr = standardStr.slice(0,firstStr)+" "+standardStr.slice(findWaGwaIndex(standardStr)+1, findUlRulIndex(standardStr)); // 남자 검은색바지
+    const targetStr = topStr +" / "+bottomStr;
+    console.log("테스트 슬라이스 : "+targetStr);
   } catch (error) {
     console.log(error);
   }
@@ -357,7 +422,7 @@ const analizeClothesByBase64 = async (code)=> {
 const searchClothes = (description) => {
   const h3Element = document.querySelector('#detailH3');// 디테일 설명 h3 태그
   const query = encodeURIComponent(description);// 번역전 영어원문의 첫줄을 받아와서 쿼리문자열으로 인코딩
-  const url = `https://www.google.com/search?tbm=isch&q=Musinsa:${query}`;
+  const url = `https://www.google.com/search?tbm=isch&q=musinsa:${query}`;
   // window.open(url, "_blank");
   const existingLink = h3Element.querySelector('a'); // h3의 자식노드의 a태그 존재확인
   if (existingLink) h3Element.removeChild(existingLink); // 존재한다면 삭제
@@ -365,9 +430,8 @@ const searchClothes = (description) => {
   link.href = url;
   link.target = '_blank'; // 새 탭에서 열기
   link.rel = 'noopener noreferrer'; // 보안용
-  link.textContent = "Search Clothes";
+  link.textContent = "Google Search Result";
   link.style.display = "block"; // 줄바꿈
-
   h3Element.appendChild(link);
 };
 
@@ -458,7 +522,7 @@ onMounted(async () => {
     <!-- textarea -->
     <div class="command">
       <h3 id="detailH3">디테일 설명</h3>
-      <textarea cols="20" rows="5" v-model="textareaContent" placeholder="Ex)검은색코트를 착용한 데일리룩"></textarea>
+      <textarea cols="20" rows="5" v-model="textareaContent" placeholder="의상카테고리를 기입해주세요.&#10;Ex)검은색코트, 데일리룩"></textarea>
     </div>
     <button @click="sendTranslate">전송</button>
     <!-- 번역 결과 영역 -->
