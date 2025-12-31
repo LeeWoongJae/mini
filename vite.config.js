@@ -29,6 +29,11 @@ export default defineConfig({
         target:'http://192.168.50.96:8001',
         changeOrigin:true,
         secure:false,
+      },
+      '/naver/shop':{
+        target:'http://192.168.50.41:3001',
+        changeOrigin:true,
+        secure:false,
       }
     }
   },
