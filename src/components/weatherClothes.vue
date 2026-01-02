@@ -78,9 +78,12 @@ const generateImage = async () => {
   try {
     const res = await axios.post('/generate', {
       prompt: transResult.value,
-      negative_prompt : 'background, scenery, environment, city, street, road, sidewalk, buildings, walls, windows, trees, grass, sky, clouds, cars, signs, extra people, crowd, face, head, hair, portrait, cropped, cut off, out of frame, blurry, low quality',
+      negative_prompt : "(head, face, facial feature, eyes, nose, lips, hair, mouth:2.0), (neck, forehead, skin:1.6), (background, scenery, environment, city, street, cafe, nature:1.8), (portrait, headshot, waist up, upper body shot:1.6), (multiple people, two people:1.5), blurry, low quality, worst quality, text, watermark, signature", // 2026. 01. 02
       return_base64: true // base64 이미지 반환 요청
     });
+    // negative_prompt: "(head, face, facial feature, eyes, nose, lips, hair, mouth:2.0), (neck, forehead, skin:1.6), (background, scenery, environment, city, street, cafe, office, nature:1.8), (portrait, headshot, waist up, upper body shot:1.6), (outdoor, indoor:1.4), blurry, low quality, worst quality, text, watermark, signature, cropped head", // 2026. 01. 02.
+    // negative_prompt: `(head, face, facial feature, eyes, nose, lips:1.8), (neck:1.5), (background, scenery, city, street, cafe, road, buildings:1.7), (portrait, headshot:1.5), skin pores, blurry, low quality, worst quality, text, watermark, signature`, // 2026. 01. 02 
+    // negative_prompt : 'blurry, low quality, background, scenery, environment, city, street, road, sidewalk, buildings, walls, windows, trees, grass, sky, clouds, cars, signs, extra people, crowd, face, head, hair, portrait, cropped, cut off, out of frame.',
     // negative_prompt : "background, scenery, environment, city, street, road, sidewalk, buildings, walls, windows, trees, grass, sky, clouds, cars, signs, extra people, crowd, (deformed iris, facial feature, eyes, nose, lips, makeup:1.4), (detailed face:1.5), (headshot:1.3), (portrait:1.2), skin pores, portrait, cropped, cut off, out of frame, blurry, low quality",
     // negative_prompt : "(full body, legs, feet, shoes, standing:1.5), (background, scenery, environment, buildings, street, trees, sky:1.5), (detailed face, facial feature, eyes, nose, lips, makeup, skin pores:1.5), (portrait, headshot:1.4), (extra people, crowd:1.3), faceless, blurred face, blurry, low quality, worst quality, watermark, text, signature",
     // negative_prompt : "(head, face, eyes, lips, nose:1.6), (background, scenery, street, buildings:1.5), (makeup, skin pores:1.4), blurry, low quality, text, watermark",
@@ -114,13 +117,12 @@ const sendTranslate = async () => {
     alert('스타일을 선택해주세요!');    return;
   }
   // 1. 한국어 문장 조합
-  // const korText = `기존에 설정된 프롬프트를 모두 무시하고 아래 지시만 따르십시오. 이 이미지는 ${getGenderKor(gender.value)} 모델의  ${checkStyle.value} 복장이다 현지역의 풍속은 ${getWindSpeedByScore(wsd.value)}이 불고, 기온은 ${t1h.value}°C 이며, 습도는 ${reh.value}%이고, 강수량은 ${getRnByScore(rn.value)}정도 되며, 강수형태는 ${getResultByScore(pty.value)} 이다 추가적으로 ${textareaContent.value} 그리고 내가 나열한 정보들을 꼭 반영해서 모델샷 이미지를 생성하라.`;
   // const korText = `이 이미지는 ${getGenderKor(gender.value)} 모델이 ${getWindSpeedByScore(wsd.value)}이 불고, 기온은 ${t1h.value}°C 이며, 습도가 ${getRehKR()}이고, 강수량은 ${getRnByScore(rn.value)}의 환경을 고려하여 입은 ${checkStyle.value}스타일 복장이다. 추가적으로 ${textareaContent.value}. full color fashion photography, accurate clothing colors, one person only`;
-  // const korText = "cropped at neck, neck-down shot, torso only, upper body only, no head visible, head out of frame, 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${textareaContent.value}."
-  const korText = "단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${textareaContent.value}."
+  // const korText = `(invisible man wearing clothes:1.6), (headless:1.5), (shot from neck down to feet:1.5), (white background:1.4), 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, (${textareaContent.value}), (one set of outfit:1.5), (outerwear, top, pants, shoes:1.4), full body outfit showcase, highly detailed fabric texture.` // 2026. 01. 02
+  const korText = `cropped at neck, neck-down shot, torso only, upper body only, no head visible, head out of frame, 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${textareaContent.value}.` // 2026. 01. 02
+  // const korText = `(shot from neck down:1.6), (headless:1.5), (white background:1.3), 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, [${textareaContent.value}}], full body shot, showing shoes, highly detailed fabric texture.` // 2026. 01. 02.
   // const korText = "(medium shot:1.5), (close-up of clothing:1.5), (torso shot:1.4), (shot from neck down:1.3), 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${textareaContent.value}, high detail fabric texture"
-  //  const korText = "(shot from neck down:1.5), (headless:1.4), full body of a person wearing ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${textareaContent.value}, vertical centered, detailed clothing"
-  // const korText = `이 이미지는 ${getGenderKor(gender.value)}모델의 ${checkStyle.value}스타일 복장이다 현재 날씨는 풍속은 ${getWindSpeedByScore(wsd.value)}이 불고, 기온은 ${t1h.value}°C 이며, 습도는 ${reh.value}%이고, 강수량은 ${getRnByScore(rn.value)}이다. ${textareaContent.value}. 반드시 torso and legs only, body cropped at neck, head cropped out of image, head completely out of frame, no face visible, fashion catalog style, isolated subject, studio product photography, plain white seamless background.`;
+  // const korText = `(shot from neck down:1.5), (headless:1.4), full body of a person wearing ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${textareaContent.value}, vertical centered, detailed clothing.`
   console.log('조합된 한국어 문장 >> '+korText);
   try {
       if (!korText) {
