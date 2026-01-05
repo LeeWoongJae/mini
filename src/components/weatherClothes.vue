@@ -30,6 +30,9 @@ import FormData from 'form-data';
  * shopResults : 검색한 상품리스트 결과를 담는 배열 변수
  * leftItems : 결과배열의 0번째 인덱스에 있는 데이터를 담는 변수
  * rightItems : 결과배열의 1번째 인덱스에 있는 데이터를 담는 변수
+ * showGuide : 가이드 표시 여부 변수
+ * clothingCategories : 의류 카테고리 리스트 변수
+ * koreanToEnglishMap : 한글 의류 카테고리를 영문 코드로 매핑하는 변수
  */
 const lat = ref(null); // 위도
 const lon = ref(null); // 경도
@@ -67,6 +70,66 @@ const searchList = ref('');
 const shopResults = ref([]);
 const leftItems = ref([]);
 const rightItems = ref([]);
+const showGuide = ref(false);
+const clothingCategories = [
+  { code: 'blouson', name: '블루종', value: '블루종' },
+  { code: 'windbreaker', name: '바람막이', value: '바람막이' },
+  { code: 'singlecoat', name: '싱글코트', value: '싱글코트' },
+  { code: 'doublecoat', name: '더블코트', value: '더블코트' },
+  { code: 'leatherjacket', name: '레더자켓', value: '레더자켓' },
+  { code: 'suedejacket', name: '스웨이드자켓', value: '스웨이드자켓' },
+  { code: 'denimjacket', name: '청자켓', value: '청자켓' },
+  { code: 'chinopants', name: '치노팬츠', value: '치노팬츠' },
+  { code: 'slacks', name: '슬렉스', value: '슬렉스' },
+  { code: 'jeans', name: '청바지', value: '청바지' },
+  { code: 'slimjeans', name: '슬림진', value: '슬림진' },
+  { code: 'regularpants', name: '레귤러핏바지', value: '레귤러핏바지' },
+  { code: 'semipants', name: '세미와이드핏바지', value: '세미와이드핏바지' },
+  { code: 'hoodie', name: '후드티', value: '후드티' },
+  { code: 'sweatpants', name: '트레이닝팬츠', value: '트레이닝팬츠' },
+  { code: 'shirt', name: '셔츠', value: '셔츠' },
+  { code: 'tshirt', name: '티셔츠', value: '티셔츠' },
+  { code: 'knit', name: '니트', value: '니트' },
+  { code: 'cardigan', name: '가디건', value: '가디건' },
+  { code: 'sneakers', name: '운동화', value: '운동화' },
+  { code: 'dressshoes', name: '구두', value: '구두' },
+  { code: 'boots', name: '부츠', value: '부츠' },
+  { code: 'derbyshoes', name: '더비슈즈', value: '더비슈즈' },
+  { code: 'loafers', name: '로퍼', value: '로퍼' },
+
+];
+const koreanToEnglishMap = {};
+clothingCategories.forEach(item => {
+  koreanToEnglishMap[item.value] = item.code;
+});
+
+/**
+ * @ 최초 생성일 :  2026. 01. 05
+ * @ author : 이웅재
+ * @ 함수명 : convertClothingKeywords
+ * @ 설명 : 사용자가 입력한 의상 키워드 문장에서 의상 카테고리만 영어로 변환하는 함수
+ */
+function convertClothingKeywords(inputText) {
+  // // 쉼표, 공백 기준으로 분리
+  // const keywords = inputText.split(/[,，\s]+/).filter(Boolean);
+
+  // return keywords.map(word => {
+  //   // 의상 카테고리만 영어로 변환, 나머지는 그대로
+  //   return koreanToEnglishMap[word] || word;
+  // }).join(' ');
+
+    // 쉼표 기준으로 분리
+  const segments = inputText.split(',').map(s => s.trim());
+
+  const result = segments.map(segment => {
+    // 각 단어 중 의상 카테고리를 영어로 변환
+    const words = segment.split(/\s+/).map(word => koreanToEnglishMap[word] || word);
+    return words.join(' '); // 색상 + 의상 공백 유지
+  });
+
+  return result.join(', '); // 각 의상 조합은 쉼표로 구분
+}
+
 /**
  * @ 최초 생성일 :  2025. 12. 17
  * @ author : 이웅재
@@ -78,9 +141,10 @@ const generateImage = async () => {
   try {
     const res = await axios.post('/generate', {
       prompt: transResult.value,
-      negative_prompt : "(head, face, facial feature, eyes, nose, lips, hair, mouth:2.0), (neck, forehead, skin:1.6), (background, scenery, environment, city, street, cafe, nature:1.8), (portrait, headshot, waist up, upper body shot:1.6), (multiple people, two people:1.5), blurry, low quality, worst quality, text, watermark, signature", // 2026. 01. 02
+      negative_prompt : "(head, face, facial feature, eyes, nose, lips, hair, mouth:2.0), (neck, forehead, skin:1.6), (background, scenery, environment, city, street, cafe, nature:1.8), (portrait, headshot:1.6), (multiple people, two people:1.5), blurry, low quality, worst quality, text, watermark, signature", // 2026. 01. 05
       return_base64: true // base64 이미지 반환 요청
     });
+    // negative_prompt : "(head, face, facial feature, eyes, nose, lips, hair, mouth:2.0), (neck, forehead, skin:1.6), (background, scenery, environment, city, street, cafe, nature:1.8), (portrait, headshot, waist up, upper body shot:1.6), (multiple people, two people:1.5), blurry, low quality, worst quality, text, watermark, signature", // 2026. 01. 02
     // negative_prompt: "(head, face, facial feature, eyes, nose, lips, hair, mouth:2.0), (neck, forehead, skin:1.6), (background, scenery, environment, city, street, cafe, office, nature:1.8), (portrait, headshot, waist up, upper body shot:1.6), (outdoor, indoor:1.4), blurry, low quality, worst quality, text, watermark, signature, cropped head", // 2026. 01. 02.
     // negative_prompt: `(head, face, facial feature, eyes, nose, lips:1.8), (neck:1.5), (background, scenery, city, street, cafe, road, buildings:1.7), (portrait, headshot:1.5), skin pores, blurry, low quality, worst quality, text, watermark, signature`, // 2026. 01. 02 
     // negative_prompt : 'blurry, low quality, background, scenery, environment, city, street, road, sidewalk, buildings, walls, windows, trees, grass, sky, clouds, cars, signs, extra people, crowd, face, head, hair, portrait, cropped, cut off, out of frame.',
@@ -116,10 +180,14 @@ const sendTranslate = async () => {
   if(checkStyle.value === "A"){
     alert('스타일을 선택해주세요!');    return;
   }
+  // 사용자가 입력한 의상 키워드 영어로 변환
+  const convertedKeywords = convertClothingKeywords(textareaContent.value);
   // 1. 한국어 문장 조합
   // const korText = `이 이미지는 ${getGenderKor(gender.value)} 모델이 ${getWindSpeedByScore(wsd.value)}이 불고, 기온은 ${t1h.value}°C 이며, 습도가 ${getRehKR()}이고, 강수량은 ${getRnByScore(rn.value)}의 환경을 고려하여 입은 ${checkStyle.value}스타일 복장이다. 추가적으로 ${textareaContent.value}. full color fashion photography, accurate clothing colors, one person only`;
   // const korText = `(invisible man wearing clothes:1.6), (headless:1.5), (shot from neck down to feet:1.5), (white background:1.4), 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, (${textareaContent.value}), (one set of outfit:1.5), (outerwear, top, pants, shoes:1.4), full body outfit showcase, highly detailed fabric texture.` // 2026. 01. 02
-  const korText = `cropped at neck, neck-down shot, torso only, upper body only, no head visible, head out of frame, 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${textareaContent.value}.` // 2026. 01. 02
+  const korText = `neck-down shot, lower body visible, full legs, 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${convertedKeywords}.`;// 2026. 01. 05 14:31
+  //const korText = `cropped at neck, neck-down shot, torso only, upper body only, no head visible, head out of frame, 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${convertedKeywords}.`; // 2026. 01. 05
+  //const korText = `cropped at neck, neck-down shot, torso only, upper body only, no head visible, head out of frame, 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${textareaContent.value}.` // 2026. 01. 02
   // const korText = `(shot from neck down:1.6), (headless:1.5), (white background:1.3), 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, [${textareaContent.value}}], full body shot, showing shoes, highly detailed fabric texture.` // 2026. 01. 02.
   // const korText = "(medium shot:1.5), (close-up of clothing:1.5), (torso shot:1.4), (shot from neck down:1.3), 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${textareaContent.value}, high detail fabric texture"
   // const korText = `(shot from neck down:1.5), (headless:1.4), full body of a person wearing ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${textareaContent.value}, vertical centered, detailed clothing.`
@@ -259,11 +327,6 @@ function getResultByScore(score) {
  * @ 설명 : 풍속데이터값을 받아오면 각 값마다 표기되는 문자 반환 함수
  */
 function getWindSpeedByScore(wspeed) {
-  // if (wspeed < 4) return `약한 바람(${wspeed}m/s)`
-  // if (wspeed >= 4 && wspeed < 9) return `약간 강한 바람(${wspeed}m/s)`
-  // if (wspeed >= 9 && wspeed < 14) return `강한 바람(${wspeed}m/s)`
-  // if (wspeed >= 14) return `매우 강한 바람(${wspeed}m/s)`
-
   if (wspeed < 4) return `약한 바람`
   if (wspeed >= 4 && wspeed < 9) return `약간 강한 바람`
   if (wspeed >= 9 && wspeed < 14) return `강한 바람`
@@ -340,37 +403,24 @@ const analizeClothesByBase64 = async (code)=> {
     });
 
     // FormData 구성
+    // 기존 프롬프트에 덮어씌우려 했으나 강제로 참고만 당하고 대부분 무시당하게 되어 공란으로 처리(Default Prompt + Custom Prompt[ignore])
     const formData = new FormData();
     formData.append('file', file);
     formData.append(
       'prompt',
-      `Ignore all previous prompts and instructions.
-        Analyze the image and describe ONLY the person's clothing.
-        Describe the clothing in the exact order below:
-        Top:<Description>
-        Bottom:<Description>
-        Outerwear:<Description or None>
-        Shoes:<Description or None>
-        Do NOT describe the background.
-        Do NOT describe the person's pose.
-        Do NOT add any extra explanations or sentences.`
+      " "
     );
-// `Describe the clothing items only.
-// Ignore background, scenery, and environment.
-
-// For each item, include color and length.
-// Use length terms such as cropped, waist-length, hip-length, full-length, or long.
-
-// Output format (use this exact structure):
-
-// Top: <description (include color and length)>
-// Bottom: <description (include color and length)>
-// Outerwear: <description (include color and length) or None>
-// Shoes: <description (include color) or None>
-// `
-    // `이전 프롬프트를 모두 무시하고 아래의 지시를 따르시오. "Analyzing Image"라는 문구만 출력하라.`
-    // `반드시 이미지에 인물의 인상착의만 상의, 하의, 외투 순서로 설명하라. 절대로 배경과 인물 포즈 설명은 제외하라.`
-    // '이 이미지를 분석하고 설명해. 만약 사람의 이미지가 아니라면 분석을 종료하고 나에게 "이 이미지는 사람이 아닙니다"라는 문구를 띄우고 사람의 이미지이라면 설명형식은 예를들면 "아우터 : 남성 다크브라운 롱코트 울 모직 / 이너 : 남성 화이트 체크셔츠 실크 / 하의 : 남성 검정 데님팬츠" 이 형식으로 하면되고 배경에 대한 설명은 생략해'
+    
+      // `Ignore all previous prompts and instructions.
+      //   Analyze the image and describe ONLY the person's clothing.
+      //   Describe the clothing in the exact order below:
+      //   Top:<Description>
+      //   Bottom:<Description>
+      //   Outerwear:<Description or None>
+      //   Shoes:<Description or None>
+      //   Do NOT describe the background.
+      //   Do NOT describe the person's pose.
+      //   Do NOT add any extra explanations or sentences.`
     formData.append('max_tokens', 100);
     formData.append('temperature', 0.15);
     formData.append('return_base64', true);
@@ -571,9 +621,33 @@ onMounted(async () => {
     </div> -->
 
     <!-- textarea -->
-    <div class="command">
+    <!-- <div class="command">
       <h3 id="detailH3">디테일 설명</h3>
-      <textarea cols="20" rows="5" v-model="textareaContent" placeholder="의상카테고리를 기입해주세요.&#10;Ex)검은색코트, 데일리룩"></textarea>
+      <textarea cols="20" rows="5" v-model="textareaContent" 
+      placeholder="의상카테고리를 영어권 기준 기입해주세요.&#10;Ex)검은색코트, 데일리룩&#10;[블루종같은 디테일은 영어로 기입 (blouson)]"></textarea>
+    </div> -->
+    <div class="command">
+      <h3 id="detailH3">사용자 입력</h3>
+
+      <textarea
+        cols="20"
+        rows="5"
+        v-model="textareaContent"
+        placeholder="의상 정보를 입력해주세요"
+        @focus="showGuide = true"
+        @blur="showGuide = false"
+      ></textarea>
+
+      <!-- focus 되었을 때만 가이드 노출 -->
+      <p v-if="showGuide" class="guide-text">
+        · 의상 정보는 영어권 기준으로 입력해주세요<br />
+        · 여러 개일 경우 쉼표(,)로 구분해주세요<br />
+        · 색상 키워드는 한국어로 입력해도 무방합니다<br />
+        · 형식은 색상  의상종류, 색상  의상종류, ...입니다<br />
+        · 예) 검은색 코트, 청바지, ...<br />
+        <!-- · 원하는 결과가 나오지않는 종류는 영어 입력 권장
+        (<strong>blouson</strong>, <strong>windbreaker</strong>) -->
+      </p>
     </div>
     <button @click="sendTranslate">전송</button>
     <!-- 번역 결과 영역 -->
@@ -684,5 +758,19 @@ onMounted(async () => {
 .shop-item img {
   width: 100%;
   border-radius: 4px;
+}
+
+textarea {
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+}
+
+.guide-text {
+  text-align: left;
+  margin-top: 6px;
+  font-size: 14px;
+  /* color: #e4dfdf; */
+   color: var(--text-muted);
+  line-height: 1.4;
 }
 </style>

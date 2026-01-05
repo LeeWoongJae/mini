@@ -3,15 +3,36 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
+  /* color-scheme: light dark; */
+  color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
+  --text-primary: rgba(255, 255, 255, 0.87);
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-muted: rgba(255, 255, 255, 0.45);
+
+  --border-default: #3a3a3a;
+  --bg-guide: #2a2a2a;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+/* 🌙 다크모드 강제
+.dark {
+  color-scheme: dark;
+
+  --text-primary: rgba(255, 255, 255, 0.87);
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-muted: rgba(255, 255, 255, 0.45);
+
+  --border-default: #3a3a3a;
+  --bg-guide: #2a2a2a;
+
+  background-color: #242424;
+  color: var(--text-primary);
+} */
 
 a {
   font-weight: 500;
@@ -28,6 +49,8 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: var(--bg-guide);
+  color: var(--text-primary);
 }
 
 h1 {
@@ -43,6 +66,7 @@ button {
   font-weight: 500;
   font-family: inherit;
   background-color: #1a1a1a;
+  color: var(--text-primary);
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -56,6 +80,11 @@ button:focus-visible {
 
 .card {
   padding: 2em;
+
+  background-color: #2a2a2a;
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  color: var(--text-primary);
 }
 
 #app {
@@ -65,6 +94,24 @@ button:focus-visible {
   text-align: center;
 }
 
+/* textarea, input 등 */
+textarea,
+input,
+select {
+  background-color: #2a2a2a;
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  padding: 0.5em;
+  font-family: inherit;
+}
+
+textarea::placeholder,
+input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* 
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -76,4 +123,4 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
+} */
