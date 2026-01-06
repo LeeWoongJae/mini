@@ -36,3 +36,14 @@
   이미지와 설명 문구를 추가해 몰입도를 높일 예정
 - CSS 및 Template 구조를 정리하여 레이아웃 일관성과 반응형 UI를 개선하고
   사용자 경험 중심의 화면 구성을 강화할 예정
+
+
+# 웹사이트 화면
+- 메인화면
+  ![메인화면](image-1.png)
+
+- WeatherClothes
+  ![WeatherClothes](image-2.png)
+
+- TypingWorld
+  ![TypingWorld](image-3.png)

@@ -145,22 +145,13 @@ const generateImage = async () => {
       return_base64: true // base64 이미지 반환 요청
     });
     // negative_prompt : "(head, face, facial feature, eyes, nose, lips, hair, mouth:2.0), (neck, forehead, skin:1.6), (background, scenery, environment, city, street, cafe, nature:1.8), (portrait, headshot, waist up, upper body shot:1.6), (multiple people, two people:1.5), blurry, low quality, worst quality, text, watermark, signature", // 2026. 01. 02
-    // negative_prompt: "(head, face, facial feature, eyes, nose, lips, hair, mouth:2.0), (neck, forehead, skin:1.6), (background, scenery, environment, city, street, cafe, office, nature:1.8), (portrait, headshot, waist up, upper body shot:1.6), (outdoor, indoor:1.4), blurry, low quality, worst quality, text, watermark, signature, cropped head", // 2026. 01. 02.
-    // negative_prompt: `(head, face, facial feature, eyes, nose, lips:1.8), (neck:1.5), (background, scenery, city, street, cafe, road, buildings:1.7), (portrait, headshot:1.5), skin pores, blurry, low quality, worst quality, text, watermark, signature`, // 2026. 01. 02 
     // negative_prompt : 'blurry, low quality, background, scenery, environment, city, street, road, sidewalk, buildings, walls, windows, trees, grass, sky, clouds, cars, signs, extra people, crowd, face, head, hair, portrait, cropped, cut off, out of frame.',
-    // negative_prompt : "background, scenery, environment, city, street, road, sidewalk, buildings, walls, windows, trees, grass, sky, clouds, cars, signs, extra people, crowd, (deformed iris, facial feature, eyes, nose, lips, makeup:1.4), (detailed face:1.5), (headshot:1.3), (portrait:1.2), skin pores, portrait, cropped, cut off, out of frame, blurry, low quality",
     // negative_prompt : "(full body, legs, feet, shoes, standing:1.5), (background, scenery, environment, buildings, street, trees, sky:1.5), (detailed face, facial feature, eyes, nose, lips, makeup, skin pores:1.5), (portrait, headshot:1.4), (extra people, crowd:1.3), faceless, blurred face, blurry, low quality, worst quality, watermark, text, signature",
-    // negative_prompt : "(head, face, eyes, lips, nose:1.6), (background, scenery, street, buildings:1.5), (makeup, skin pores:1.4), blurry, low quality, text, watermark",
-    // background, scenery, environment, city, street, road, sidewalk, buildings, walls, windows, trees, grass, sky, clouds, cars, signs, extra people, crowd, (deformed iris, facial feature, eyes, nose, lips, makeup:1.4), (detailed face:1.5), (headshot:1.3), (portrait:1.2), skin pores, portrait, cropped, cut off, out of frame, blurry, low quality
     // (background, scenery, environment, buildings, street, trees, sky:1.5), (detailed face, facial feature, eyes, nose, lips, makeup, skin pores:1.5), (portrait, headshot:1.4), (extra people, crowd:1.3), faceless, blurred face, blurry, low quality, worst quality, watermark, text, signature
-    // 'blurry, low quality, sepia, text, cropped, close-up, upper body only, bust shot, headshot, face, head, hair, eyes, mouth, beard, multiple people, two people, group, crowd, extra person, background people, reflection of people, mannequin, scenery, landscape, cityscape, environment,location, place, outdoor, indoor, room, wall, floor,multiple views, sequence, comic, 2koma, 4koma, letterboxed, framed, border, speech bubble'
-    // 'blurry, low quality, portrait, close-up, upper body only, bust shot, headshot, head, face, facial features, hair, beard, multiple people, two people, group, crowd, extra person, background people, reflection of people, mannequin, detailed background',
-    // 'blurry, low quality, deformed body, portrait, close-up, upper body only, bust shot, headshot, face, facial features, head, hair, beard, cropped legs, out of frame legs, cut off legs, detailed background, complex scenery, desaturated, no color, low saturation',
-    // 'blurry, low quality, nsfw, Missing limbs, portrait, close-up, upper body only, bust shot, headshot, face, facial features, head, hair beard, portrait, background, scenery, environment, street, road, city, building, wall, floor, sky',
 
     imageSrc.value = `data:image/png;base64,${res.data.image_base64}`
     // imageSrc.value = res.data.image;
-    // console.log(" 생성된 이미지 확인 >> "+imageSrc.value);
+    // console.log(" 생성된 이미지 코드 >> "+imageSrc.value);
     analizeClothesByBase64(imageSrc.value);
   } catch (err) {
     console.error(err)
@@ -183,21 +174,17 @@ const sendTranslate = async () => {
   // 사용자가 입력한 의상 키워드 영어로 변환
   const convertedKeywords = convertClothingKeywords(textareaContent.value);
   // 1. 한국어 문장 조합
-  // const korText = `이 이미지는 ${getGenderKor(gender.value)} 모델이 ${getWindSpeedByScore(wsd.value)}이 불고, 기온은 ${t1h.value}°C 이며, 습도가 ${getRehKR()}이고, 강수량은 ${getRnByScore(rn.value)}의 환경을 고려하여 입은 ${checkStyle.value}스타일 복장이다. 추가적으로 ${textareaContent.value}. full color fashion photography, accurate clothing colors, one person only`;
   // const korText = `(invisible man wearing clothes:1.6), (headless:1.5), (shot from neck down to feet:1.5), (white background:1.4), 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, (${textareaContent.value}), (one set of outfit:1.5), (outerwear, top, pants, shoes:1.4), full body outfit showcase, highly detailed fabric texture.` // 2026. 01. 02
   const korText = `neck-down shot, lower body visible, full legs, 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${convertedKeywords}.`;// 2026. 01. 05 14:31
   //const korText = `cropped at neck, neck-down shot, torso only, upper body only, no head visible, head out of frame, 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${convertedKeywords}.`; // 2026. 01. 05
   //const korText = `cropped at neck, neck-down shot, torso only, upper body only, no head visible, head out of frame, 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${textareaContent.value}.` // 2026. 01. 02
-  // const korText = `(shot from neck down:1.6), (headless:1.5), (white background:1.3), 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, [${textareaContent.value}}], full body shot, showing shoes, highly detailed fabric texture.` // 2026. 01. 02.
-  // const korText = "(medium shot:1.5), (close-up of clothing:1.5), (torso shot:1.4), (shot from neck down:1.3), 단 1명, ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${textareaContent.value}, high detail fabric texture"
-  // const korText = `(shot from neck down:1.5), (headless:1.4), full body of a person wearing ${getGenderKor(gender.value)} 모델, ${getThermalState(t1h.value, reh.value)} 날씨, ${checkStyle.value}스타일, ${textareaContent.value}, vertical centered, detailed clothing.`
   console.log('조합된 한국어 문장 >> '+korText);
   try {
       if (!korText) {
         console.warn('번역할 텍스트가 비어 있음');
         return;
     }
-    // 2. 백엔드로 전송 → 번역 요청
+    // 2. 백엔드로 번역 요청
     const response = await axios.post('/translate', {
       text: korText,
       source : 'ko',
@@ -221,7 +208,7 @@ const sendTranslate = async () => {
     console.error("번역 요청 실패 : "+err);
   }
 };
-// https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?serviceKey=vExVsx1FJkY9Uma%2BjJadUHgr%2BPmrFWpSYvG64oal%2FQDNkwHqVRw%2B68%2Bl3hmjmyB7SNjoN%2BtUI9j%2FljKQObjoFg%3D%3D&pageNo=1&numOfRows=1000&dataType=XML&base_date=20251215&base_time=0600&nx=55&ny=127
+
 function getTimeHHMM(date = new Date()) {
   const h = String(date.getHours()-1).padStart(2, '0');
   const m = String(date.getMinutes()).padStart(2, '0');
@@ -229,41 +216,6 @@ function getTimeHHMM(date = new Date()) {
 }
 baseTime.value = getTimeHHMM();
 // console.log("현재 시간 : "+baseTime.value);
-
-/**
- * @ 최초 생성일 :  2025. 12. 29
- * @ author : 이웅재
- * @ 함수명 : getRehKR
- * @ 설명 : 기온값에 따른 습도를 한글로 변환해주는 함수
- */
-function getRehKR() {
-  const t = t1h.value;
-  const h = reh.value;
-
-  if (t <= 0) {
-    if (h <= 40) return '낮음';
-    else if (h <= 70) return '보통';
-    else return '높음';
-  }
-
-  else if (t <= 15) {
-    if (h <= 35) return '낮음';
-    else if (h <= 65) return '보통';
-    else return '높음';
-  }
-
-  else if (t <= 25) {
-    if (h <= 40) return '낮음';
-    else if (h <= 60) return '보통';
-    else return '높음';
-  }
-
-  else {
-    if (h <= 45) return '낮음';
-    else if (h <= 65) return '보통';
-    else return '높음';
-  }
-}
 
 /**
  * @ 최초생성일 : 2025. 12. 30.
@@ -274,12 +226,12 @@ function getRehKR() {
 function getThermalState(temp, humidity) {
   let state;
 
-  // 1️⃣ 기본 기온 기준
+  // 기온 기준
   if (temp <= 5) state = '추운';
   else if (temp <= 20) state = '보통';
   else state = '더운';
 
-  // 2️⃣ 습도 보정 (체감용)
+  // 습도 (체감용)
   if (humidity >= 70) {
     if (state === '보통' && temp <= 10) state = '추운';
     if (state === '보통' && temp >= 25) state = '더운';
@@ -302,49 +254,6 @@ function getGenderKor(gender) {
   if (gender == 'male') return '남자'
   if (gender == 'female') return '여자'
   if (gender == 'none') return '선택안함'
-}
-
-/**
- * @ 최초 생성일 :  2025. 12. 17
- * @ author : 이웅재
- * @ 함수명 : getResultByScore
- * @ 설명 : 강수형태를 받아오면 각 값마다 표기되는 문자 반환 함수
- */
-function getResultByScore(score) {
-  if (score == 0) return '없음'
-  if (score == 1) return '비 내림'
-  if (score == 2) return '비 또는 눈 내림'
-  if (score == 3) return '눈 내림'
-  if (score == 5) return '빗방울 내림'
-  if (score == 6) return '빗방울눈날림'
-  if (score == 7) return '눈날림'
-}
-
-/**
- * @ 최초 생성일 :  2025. 12. 17
- * @ author : 이웅재
- * @ 함수명 : getWindSpeedByScore
- * @ 설명 : 풍속데이터값을 받아오면 각 값마다 표기되는 문자 반환 함수
- */
-function getWindSpeedByScore(wspeed) {
-  if (wspeed < 4) return `약한 바람`
-  if (wspeed >= 4 && wspeed < 9) return `약간 강한 바람`
-  if (wspeed >= 9 && wspeed < 14) return `강한 바람`
-  if (wspeed >= 14) return `매우 강한 바람`
-}
-
-/**
- * @ 최초 생성일 :  2025. 12. 17
- * @ author : 이웅재
- * @ 함수명 : getRnByScore
- * @ 설명 : 강수량데이터값을 받아오면 각 값마다 표기되는 문자 반환 함수
- */
-function getRnByScore(score) {
-  if (score == '-' || score == null || score == 0) return `강수없음`
-  if (score >= 0.1 && score < 1.0) return `1mm미만`
-  if (score >= 30.0 && score < 50.0) return `30.0~50.0mm`
-  if (score >= 50.0 ) return `50.0mm 이상`
-
 }
 
 /**
@@ -408,9 +317,17 @@ const analizeClothesByBase64 = async (code)=> {
     formData.append('file', file);
     formData.append(
       'prompt',
-      " "
+      `Ignore all previous prompts and instructions.
+        Analyze the image and describe ONLY the person's clothing.
+        Describe the clothing in the exact order below:
+        Top:<Description>
+        Bottom:<Description>
+        Outerwear:<Description>
+        Shoes:<Description or None>
+        Do NOT describe the background.
+        Do NOT describe the person's pose.
+        Do NOT add any extra explanations or sentences.`
     );
-    
       // `Ignore all previous prompts and instructions.
       //   Analyze the image and describe ONLY the person's clothing.
       //   Describe the clothing in the exact order below:
@@ -450,15 +367,11 @@ const analizeClothesByBase64 = async (code)=> {
       console.warn('LLM 응답이 비어있음:', raw);
       return;
     }
-
-    // reportBase64.value = onlyAssistant;
+    
     // const onlyAssistant = raw.split('Assistant:')[1]?.trim();
     console.log("onlyAssistant : ", onlyAssistant);
     reportBase64.value = onlyAssistant;
-    //  if (!reportBase64.value || !reportBase64.value.trim()) {
-    //     console.warn('번역할 분석 텍스트가 비어 있음');
-    //     return;
-    //   } 
+
     console.log('의상 분석 결과(reportBase64):', reportBase64.value);
     
   } catch (error) {
@@ -473,7 +386,8 @@ const analizeClothesByBase64 = async (code)=> {
     });
     console.log(response.data.translatedText);
     translateKorFromEng.value = response.data.translatedText;
-    // searchClothes(reportBase64.value.slice(0, reportBase64.value.indexOf('.'))); // 구글 키워드 서치 함수
+    
+
     const splitDotStr = translateKorFromEng.value.slice(0, translateKorFromEng.value.indexOf('.'));
     const standardStr = splitDotStr;
     const firstStr = standardStr.indexOf('는') // 남자는 , 여자는
@@ -489,22 +403,6 @@ const analizeClothesByBase64 = async (code)=> {
   }
 
 }// End of analizeClothesByBase64
-
-const searchClothes = (description) => {
-  const h3Element = document.querySelector('#detailH3');// 디테일 설명 h3 태그
-  const query = encodeURIComponent(description);// 번역전 영어원문의 첫줄을 받아와서 쿼리문자열으로 인코딩
-  const url = `https://www.google.com/search?tbm=isch&q=musinsa:${query}`;
-  // window.open(url, "_blank");
-  const existingLink = h3Element.querySelector('a'); // h3의 자식노드의 a태그 존재확인
-  if (existingLink) h3Element.removeChild(existingLink); // 존재한다면 삭제
-  const link = document.createElement('a');
-  link.href = url;
-  link.target = '_blank'; // 새 탭에서 열기
-  link.rel = 'noopener noreferrer'; // 보안용
-  link.textContent = "Google Search Result";
-  link.style.display = "block"; // 줄바꿈
-  h3Element.appendChild(link);
-};
 
 /**
  * @ 최초 생성일 :  2025. 12. 31.
@@ -607,25 +505,8 @@ onMounted(async () => {
 
     <!-- 기상 정보 영역 -->
     <!-- <div class="weather-info">
-      <h3>현재 위치 기반 기상 정보({{baseTime}} 기준)</h3>1
-      <small><strong>*기준 시간으로부터 약 3시간 정도의 기상예보입니다</strong></small>
-      <div class="weather-items">
-        <p>강수량: {{ getRnByScore(rn) }}</p>
-        <p>강수형태: {{ getResultByScore(pty) }}</p>
-        <p>습도: {{ reh }}%</p>
-        <p>풍속: {{ getWindSpeedByScore(wsd) }}</p>
-        <p>기온: {{ t1h }}℃</p>
-        <p>위도: {{ lat }}</p>
-        <p>경도: {{ lon }}</p>
-      </div>
     </div> -->
 
-    <!-- textarea -->
-    <!-- <div class="command">
-      <h3 id="detailH3">디테일 설명</h3>
-      <textarea cols="20" rows="5" v-model="textareaContent" 
-      placeholder="의상카테고리를 영어권 기준 기입해주세요.&#10;Ex)검은색코트, 데일리룩&#10;[블루종같은 디테일은 영어로 기입 (blouson)]"></textarea>
-    </div> -->
     <div class="command">
       <h3 id="detailH3">사용자 입력</h3>
 
@@ -645,20 +526,14 @@ onMounted(async () => {
         · 색상 키워드는 한국어로 입력해도 무방합니다<br />
         · 형식은 색상  의상종류, 색상  의상종류, ...입니다<br />
         · 예) 검은색 코트, 청바지, ...<br />
-        <!-- · 원하는 결과가 나오지않는 종류는 영어 입력 권장
-        (<strong>blouson</strong>, <strong>windbreaker</strong>) -->
       </p>
     </div>
-    <button @click="sendTranslate">전송</button>
-    <!-- 번역 결과 영역 -->
-     <!-- <textarea id="transResArea" cols="50" rows="10" v-model="transResult" placeholder="영문으로 변환된 결과" readonly></textarea> -->
     <!--이미지 생성 버튼  -->
-     <!-- <button v-if="transResult" @click="generateImage">생성</button> -->
+    <button @click="sendTranslate">전송</button>
+
      <div v-if="loading">이미지 생성 중...</div>
 
     <!-- 번역한 영문을 prompt로 보내서 받아온 결과 이미지 -->
-     <!--<img v-if="imageSrc" :src="imageSrc" />-->
-
      <div class="result-layout" v-if="imageSrc">
         <!-- 왼쪽 -->
         <div class="side left">
@@ -667,7 +542,7 @@ onMounted(async () => {
             <div v-for="item in leftItems" :key="item.link" class="shop-item">
               <a :href="item.link" target="_blank">
                 <p v-html="item.title"></p>
-                <span>{{ item.lprice }}원</span>
+                <!-- <span>{{ item.lprice }}원</span> -->
               </a>
               
             </div>
@@ -677,7 +552,9 @@ onMounted(async () => {
         <!-- 중앙 이미지 -->
         <div class="center">
           <img :src="imageSrc" class="generated-image" />
+          
         </div>
+        
 
         <!-- 오른쪽 -->
         <div class="side right">
@@ -686,7 +563,7 @@ onMounted(async () => {
             <div v-for="item in rightItems" :key="item.link" class="shop-item">
               <a :href="item.link" target="_blank">
                 <p v-html="item.title"></p>
-                <span>{{ item.lprice }}원</span>
+                <!-- <span>{{ item.lprice }}원</span> -->
               </a>
               
             </div>
@@ -696,9 +573,9 @@ onMounted(async () => {
 
       </div>
 
-     <div>
-      <textarea v-if="translateKorFromEng" cols="120" rows="20" v-model="translateKorFromEng" name="analizeBase64" id="reportCode" readonly></textarea>
-     </div>
+      <div>
+          <textarea v-if="translateKorFromEng" cols="120" rows="20" v-model="translateKorFromEng" name="analizeBase64" id="reportCode" readonly></textarea>
+      </div>
   </div>
 
 </template>
