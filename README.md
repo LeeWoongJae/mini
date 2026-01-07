@@ -26,6 +26,7 @@
 - Vue 3 + Vite 기반 SPA 구성
 - Pinia를 사용해 전역 상태 관리
 - LocalStorage를 활용해 사용자 설정 및 기록 영속화
+- Naver Papago API를 통해 사용자의 요구사항 및 VL 응답 번역
 - navigator API를 통해 브라우저 기준 위치 정보 획득
 - 초단기실황조회 API를 활용한 실시간 기상 정보 조회
 
@@ -39,11 +40,11 @@
 
 
 # 웹사이트 화면
-- 메인화면
+### 메인화면
   ![메인화면](image-1.png)
 
-- WeatherClothes
+### WeatherClothes
   ![WeatherClothes](image-2.png)
 
-- TypingWorld
+### TypingWorld
   ![TypingWorld](image-3.png)
