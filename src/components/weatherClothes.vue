@@ -317,16 +317,18 @@ const analizeClothesByBase64 = async (code)=> {
     formData.append('file', file);
     formData.append(
       'prompt',
-      `Ignore all previous prompts and instructions.
-        Analyze the image and describe ONLY the person's clothing.
-        Describe the clothing in the exact order below:
-        Top:<Description>
-        Bottom:<Description>
-        Outerwear:<Description>
-        Shoes:<Description or None>
-        Do NOT describe the background.
-        Do NOT describe the person's pose.
-        Do NOT add any extra explanations or sentences.`
+      `Output format (strict):
+
+      Top: <Description or None>
+      Outerwear: <Description or None>
+      Bottom: <Description>
+      Shoes: <Description or None>
+
+      Example Output:
+      Top: None
+      Outerwear: gray coat
+      Bottom: black pants
+      Shoes: None`
     );
       // `Ignore all previous prompts and instructions.
       //   Analyze the image and describe ONLY the person's clothing.

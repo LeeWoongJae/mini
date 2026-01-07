@@ -8,7 +8,6 @@ import { fileURLToPath } from 'url';
 import multer from 'multer';
 import FormData from 'form-data';
 import fs from 'fs';
-import { error } from 'console';
 
 dotenv.config();
 
@@ -26,7 +25,10 @@ const vlApiIp = process.env.VL_API_IP; // Vision Language API IP
 const serviceKey = process.env.SERVICE_KEY;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const upload = multer({ dest: 'uploads/' });
+// const upload = multer({ dest: 'uploads/' });
+const upload = multer({
+  storage: multer.memoryStorage()
+});
 
 /** @ 최초생성일 : 2025. 12. 16.
  * @ 작성자 : 이웅재
@@ -219,8 +221,13 @@ app.post('/upload_and_generate', upload.single('file'), async (req, res) => {
     const formData = new FormData();
     formData.append(
       'file',
-      fs.createReadStream(file.path),
-      file.originalname
+       file.buffer,
+        {
+          filename: file.originalname,
+          contentType: file.mimetype
+        }
+      // fs.createReadStream(file.path),
+      // file.originalname
     );
 
     
