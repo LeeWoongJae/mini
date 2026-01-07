@@ -1,46 +1,47 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path';
+import { env } from 'process';
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [vue()],
-  server: {
-    proxy: {
-      '/weather': {
-        target: 'http://192.168.50.41:3001',  // Node.js 서버 주소
-        changeOrigin: true,
-        secure: false,
-        // rewrite: (path) => path.replace(/^\/weather/, '/weather')
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(),'');
+
+  return {
+    plugins: [vue()],
+    server: {
+      proxy: {
+        '/weather': {
+          target: env.MY_BASE_URL,
+          changeOrigin: true,
+          secure: false,
+        },
+        '/translate': {
+          target: env.MY_BASE_URL,
+          changeOrigin: true,
+          secure: false,
+        },
+        '/generate': {
+          target: env.GENERATE_API_IP,
+          changeOrigin: true,
+          secure: false,
+        },
+        '/upload_and_generate': {
+          target: env.VL_API_IP,
+          changeOrigin: true,
+          secure: false,
+        },
+        '/naver/shop': {
+          target: env.MY_BASE_URL,
+          changeOrigin: true,
+          secure: false,
+        },
       },
-      '/translate': {
-        target: 'http://192.168.50.41:3001', 
-        changeOrigin: true,
-        secure: false,
-        // rewrite: (path) => path.replace(/^\/translate/, '/translate')
+    },
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, 'src'),
       },
-      '/generate':{
-        target:'http://192.168.50.96:8000',
-        changeOrigin:true,
-        secure:false,
-        // rewrite: (path) => path.replace(/^\/translate/, '/translate')
-      },
-      '/upload_and_generate':{
-        target:'http://192.168.50.96:8001',
-        changeOrigin:true,
-        secure:false,
-      },
-      '/naver/shop':{
-        target:'http://192.168.50.41:3001',
-        changeOrigin:true,
-        secure:false,
-      }
-    }
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, 'src')
-    }
-  },
-  
-})
+    },
+  };
+});
