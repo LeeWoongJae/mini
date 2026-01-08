@@ -110,14 +110,6 @@ clothingCategories.forEach(item => {
  * @ 설명 : 사용자가 입력한 의상 키워드 문장에서 의상 카테고리만 영어로 변환하는 함수
  */
 function convertClothingKeywords(inputText) {
-  // // 쉼표, 공백 기준으로 분리
-  // const keywords = inputText.split(/[,，\s]+/).filter(Boolean);
-
-  // return keywords.map(word => {
-  //   // 의상 카테고리만 영어로 변환, 나머지는 그대로
-  //   return koreanToEnglishMap[word] || word;
-  // }).join(' ');
-
     // 쉼표 기준으로 분리
   const segments = inputText.split(',').map(s => s.trim());
 
@@ -198,7 +190,6 @@ const sendTranslate = async () => {
       return;
     }
     transResult.value = translated;
-    // transResult.value = response.data.translatedText;
     console.log('번역된 영어 문장'+translated);
 
     // 3. 번역된 문장으로 이미지 생성 요청
@@ -215,7 +206,6 @@ function getTimeHHMM(date = new Date()) {
   return `${h}:${m}`;
 }
 baseTime.value = getTimeHHMM();
-// console.log("현재 시간 : "+baseTime.value);
 
 /**
  * @ 최초생성일 : 2025. 12. 30.
@@ -454,17 +444,14 @@ onMounted(async () => {
       async (position) => {
          lat.value = position.coords.latitude;
          lon.value = position.coords.longitude;
-       // console.log("lat / lon value : "+lat.value, lon.value);
         // Node.js 백엔드에 좌표 전달
         try {
-         // console.log(`웹브라우저 위치 정보 >> Lat: ${lat.value}, Lon: ${lon.value}`);
           const response = await axios.get("/weather", {
             params : { 
                        lat:lat.value, 
                        lon:lon.value 
                      }
           });
-         // console.log(response.data);
           weatherData.value = response.data;
           const items = weatherData.value?.response?.body?.items?.item || [];
           rn.value  = items.find(i => i.category === "RN1")?.obsrValue;

@@ -187,18 +187,6 @@ try{
   
    console.log("서버에서 넘어온 이미지 : "+response.data);
    return res.status(200).json(response.data);
-   //  const base64Image =
-   //     response.data?.image || response.data?.images?.[0];
-
-  //   if (!base64Image) {
-  //     return res.status(500).json({ message: 'Image generation failed' });
-  //   }
-
-  //   // Express가 최종 응답
-  //   res.status(200).json({
-  //     success: true,
-  //     image: `data:image/png;base64,${base64Image}`
-  //   });
 }catch(err){
    console.error(err);
    console.log(err.response?.data || err.message);
@@ -230,12 +218,10 @@ app.post('/upload_and_generate', upload.single('file'), async (req, res) => {
       // file.originalname
     );
 
-    
     formData.append('prompt', prompt);
     formData.append('max_tokens', max_tokens);
     formData.append('temperature', temperature);
     formData.append('return_base64', return_base64);
-
     
     const response = await axios.post(
       `${vlApiIp}/upload_and_generate`,
