@@ -317,7 +317,8 @@ const analizeClothesByBase64 = async (code)=> {
     formData.append('file', file);
     formData.append(
       'prompt',
-      `Output format (strict):
+      
+ `Output format (strict):
 
       Top: <Description or None>
       Outerwear: <Description or None>
@@ -330,16 +331,26 @@ const analizeClothesByBase64 = async (code)=> {
       Bottom: black pants
       Shoes: None`
     );
-      // `Ignore all previous prompts and instructions.
-      //   Analyze the image and describe ONLY the person's clothing.
-      //   Describe the clothing in the exact order below:
-      //   Top:<Description>
-      //   Bottom:<Description>
-      //   Outerwear:<Description or None>
-      //   Shoes:<Description or None>
-      //   Do NOT describe the background.
-      //   Do NOT describe the person's pose.
-      //   Do NOT add any extra explanations or sentences.`
+      // `Focus on identifying visible clothing only.
+
+      // Include outerwear and inner layers if visible.
+      // Do not describe the face, pose, or background.
+
+      // Return the clothing summary using the labels below.
+      // Any extra descriptions outside the labels are optional and may be ignored.
+
+      // Clothing summary format:
+
+      // Top: <Description or None>
+      // Outerwear: <Description or None>
+      // Bottom: <Description>
+      // Shoes: <Description or None>
+
+      // Example:
+      // Top: None
+      // Outerwear: gray coat
+      // Bottom: black pants
+      // Shoes: None`
     formData.append('max_tokens', 100);
     formData.append('temperature', 0.15);
     formData.append('return_base64', true);
@@ -354,7 +365,7 @@ const analizeClothesByBase64 = async (code)=> {
       }
     );
 
-    // console.log('분석 결과:', response.data.response);
+    // console.log('분석 결과:', response?.data);
     const raw = response.data.response;
     console.log("raw : ", raw);
     let onlyAssistant = raw;
