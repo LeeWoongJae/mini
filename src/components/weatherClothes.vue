@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import FormData from 'form-data';
 /**
@@ -14,8 +14,8 @@ import FormData from 'form-data';
  * wsd : 풍속
  * t1h : 기온
  * gender : 성별 선택 박스
- * style : 스타일 리스트
  * stylebox : 스타일 리스트 저장
+ * styleOpen : 스타일 선택 박스 오픈 여부
  * checkStyle : 선택된 스타일 값
  * today : 현재 날짜
  * baseTime : 현재시간으로부터 1시간 전
@@ -43,21 +43,22 @@ const reh = ref(0); // 습도
 const wsd = ref(0.0); // 풍속
 const t1h = ref(0.0); // 기온
 const gender = ref('Male'); // gender select box
-const style = ref([{code : 'ca', name : '캐주얼',value:'캐주얼'}, 
-                   {code : 'st', name : '스트릿',value : '스트릿'},
-                   {code : 'vtg', name : '빈티지',value : '빈티지'},
-                   {code : 'cls', name : '클래식',value : '클래식'},
-                   {code : 'nc', name : '놈코어',value : '놈코어'}, // 일상적인 평범한 패션
-                   {code : 'md', name : '모던', value : '모던'},
-                   {code : 'fe', name : '페미닌', value : '페미닌'},// 여성스러운 패션
-                   {code : 'da', name : '댄디', value : '댄디'},
-                   {code : 'mi', name : '미니멀리즘', value : '미니멀리즘'},
-                   {code : 'la', name : '레이어드', value : '레이어드'},
-                   {code : 'spt', name : '스포티', value : '스포티'},
-                   {code : 'av', name : '아방가르드', value : '아방가르드'},
-                   ]
-                ); // 스타일 선택 박스
-const stylebox = ref(style); // second gender select box
+// const style = ref(null); // 스타일 선택 박스
+const styleOpen = ref(false);
+const stylebox = ref([{code : 'ca', name : '캐주얼',value:'캐주얼', description:'편안함을 강조하며 격식 없이 일상생활에서 가볍게 입을 수 있는 옷차림'}, 
+                   {code : 'st', name : '스트릿',value : '스트릿', description:'특정 틀에 얽매이지 않고 자신의 취향을 개성 있게 표현하는 옷차림'},
+                   {code : 'vtg', name : '빈티지',value : '빈티지', description:'시간의 흔적과 깊이를 더하고 개성을 표현하는 옷차림'},
+                   {code : 'cls', name : '클래식',value : '클래식', description:'유행을 타지 않는 고전적이고 단정한 옷차림'},
+                   {code : 'nc', name : '놈코어',value : '놈코어', description:'일부러 꾸미지 않은 듯한 평범하고 일상적인 옷차림을 통해 오히려 세련됨을 추구하는 옷차림'}, // 일상적인 평범한 패션
+                   {code : 'md', name : '모던', value : '모던', description:'장식적 요소를 배제하고 기능성과 실용성을 강조하는 심플하면서도 세련된 옷차림'},
+                   {code : 'fe', name : '페미닌', value : '페미닌', description:'여성스러움과 우아함을 강조하는 옷차림'},// 여성스러운 패션
+                   {code : 'da', name : '댄디', value : '댄디', description:'격식을 갖추면서도 너무 딱딱하지 않고 세련되고 깔끔하며 도시적인 느낌을 주는 옷차림'},
+                   {code : 'mi', name : '미니멀리즘', value : '미니멀리즘', description:'극도의 단순함과 절제를 추구하며, 과도한 장식과 화려함을 배제하고 최소한의 요소로 세련됨을 표현하는 옷차림'},
+                   {code : 'la', name : '레이어드', value : '레이어드', description:'다양한 소재와 길이의 아이템을 조합해 개성과 깊이감을 주는 옷차림'},
+                   {code : 'spt', name : '스포티', value : '스포티', description:'스포츠웨어의 활동성과 편안함을 일상복에 접목한 옷차림'},
+                   {code : 'av', name : '아방가르드', value : '아방가르드', description:'예술적이고 혁신적인 접근으로 평범함을 거부하고 새로운 미학을 추구하는 옷차림'},
+                   ]);
+const styleDesc = ref(''); // 스타일 설명 툴팁
 const checkStyle = ref("A"); // 선택된 스타일 값
 const textareaContent = ref('');
 const transResult = ref(null);
@@ -423,6 +424,7 @@ const getShopSearchResult = async (text) =>{
     },
     });
     if(response.data){
+      console.log("유사한 판매링크 obj : "+response?.data[0]);
       shopResults.value = response.data;
       const validResults = response.data.filter(
         arr => Array.isArray(arr) && arr.length > 0
@@ -430,7 +432,7 @@ const getShopSearchResult = async (text) =>{
 
 
       leftItems.value = validResults[0] || [];
-      rightItems.value = validResults[1] || [];
+      // rightItems.value = validResults[1] || [];
       return response.data;
     }
   } catch (error) {
@@ -487,19 +489,39 @@ onMounted(async () => {
         <h3>성별 선택</h3>
         <!-- <input type="radio" id="none" value="none" v-model="gender">
         <label for="none">선택안함</label> -->
-        <input type="radio" id="male" value="male" v-model="gender">
+        <!-- <input type="radio" id="male" value="male" v-model="gender">
         <label for="male">Male</label>
         <input type="radio" id="female" value="female" v-model="gender">
-        <label for="female">Female</label>
+        <label for="female">Female</label> -->
+        <div class="gender-group">
+          <label
+            class="gender-card"
+            :class="{ active: gender === 'male' }"
+          >
+            <input type="radio" value="male" v-model="gender" />
+            <span class="icon"><img src="http://img.icons8.com/?size=36&id=12351&format=png&color=000000"></span>
+          </label>
+
+          <label
+            class="gender-card"
+            :class="{ active: gender === 'female' }"
+          >
+            <input type="radio" value="female" v-model="gender" />
+            <span class="icon"><img src="http://img.icons8.com/?size=36&id=pj-lbkskSrS2&format=png&color=000000"></span>
+          </label>
+        </div>
       </div>
 
       <div>
         <h3>스타일 선택</h3>
         <select v-model="checkStyle">
-          <option v-for="s in stylebox" :key="s.code" :value="s.value">
+          <option v-for="s in stylebox" :key="s.code" :value="s.value" :title="s.description">
             {{ s.name }}
           </option>
         </select>
+        <p class="guide-text">
+          스타일 리스트에 마우스를 올려두면 설명이 표시됩니다.
+        </p>
       </div>
     </div>
 
@@ -524,8 +546,9 @@ onMounted(async () => {
         · 의상 정보는 영어권 기준으로 입력해주세요<br />
         · 여러 개일 경우 쉼표(,)로 구분해주세요<br />
         · 색상 키워드는 한국어로 입력해도 무방합니다<br />
-        · 형식은 색상  의상종류, 색상  의상종류, ...입니다<br />
+        · 형식은 색상  의상종류, 색상  의상종류, ...입니다(키워드로만 입력시 정확도 상승)<br />
         · 예) 검은색 코트, 청바지, ...<br />
+        · 예) 검은색 셔츠와 청바지를 입은 데일리룩 추천해주세요.<br />
       </p>
     </div>
     <!--이미지 생성 버튼  -->
@@ -537,7 +560,7 @@ onMounted(async () => {
      <div class="result-layout" v-if="imageSrc">
         <!-- 왼쪽 -->
         <div class="side left">
-          <h3>유사한 판매링크 1</h3>
+          <h3>유사한 판매링크</h3>
           <div v-if="leftItems.length > 0">
             <div v-for="item in leftItems" :key="item.link" class="shop-item">
               <a :href="item.link" target="_blank">
@@ -557,25 +580,27 @@ onMounted(async () => {
         
 
         <!-- 오른쪽 -->
-        <div class="side right">
+        <!-- <div class="side right">
           <h3>유사한 판매링크 2</h3>
           <div v-if="rightItems.length > 0">
             <div v-for="item in rightItems" :key="item.link" class="shop-item">
               <a :href="item.link" target="_blank">
                 <p v-html="item.title"></p>
-                <!-- <span>{{ item.lprice }}원</span> -->
+                
               </a>
               
             </div>
           </div>
           <div v-else>Not found or failed search</div>
-        </div>
+        </div> -->
 
       </div>
 
       <div>
           <textarea v-if="translateKorFromEng" cols="120" rows="20" v-model="translateKorFromEng" name="analizeBase64" id="reportCode" readonly></textarea>
       </div>
+
+      <!-- End of container -->
   </div>
 
 </template>
@@ -621,6 +646,27 @@ onMounted(async () => {
   flex: 1;
   display: flex;
   justify-content: center;
+}
+
+.gender-group {
+  display: flex;
+  gap: 8px;
+}
+
+.gender-card input {
+  display: none;
+}
+
+.gender-card {
+  border: 1px solid #374151;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.gender-card.active {
+  border-color: #6366f1;
+  background: #1f2937;
 }
 
 .generated-image {
