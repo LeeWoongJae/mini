@@ -186,7 +186,7 @@ const currentGroup = computed(() => {
 const placeholderText = computed(() => {
   switch (gameStore.language) {
     case 'en':
-      return 'Enter your answer, then press Enter'
+      return 'Type the sentence exactly as shown and press Enter'
     case 'jp':
       return 'ここに入力してください'
     default:
