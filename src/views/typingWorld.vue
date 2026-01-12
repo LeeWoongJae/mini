@@ -183,6 +183,17 @@ const currentGroup = computed(() => {
   return selectedPracticeGroups.value[currentIndex.value]
 });
 
+const placeholderText = computed(() => {
+  switch (gameStore.language) {
+    case 'en':
+      return 'Enter your answer, then press Enter'
+    case 'jp':
+      return 'ここに入力してください'
+    default:
+      return '위 문장을 입력하고 Enter를 누르세요'
+  }
+})
+
 const timeOver = () => {
   clearInterval(timerId.value)
   timerId.value = null;
@@ -439,7 +450,7 @@ onMounted(() => {
     :readonly="isReadonly"
     rows="5"
     style="width: 100%;"
-    placeholder="위 문장을 입력하고 Enter를 누르세요"
+    :placeholder="placeholderText"
   />
 
   <button v-if="showRetryBtn" @click="resetGame">재도전</button>
