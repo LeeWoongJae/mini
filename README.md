@@ -36,7 +36,18 @@
 - CSS 및 Template 구조를 정리하여 레이아웃 일관성과 반응형 UI를 개선하고
   사용자 경험 중심의 화면 구성을 강화할 예정
 
-# 사이트 이용 방법
+# Environment Variables
+
+### Server (.env)
+- 경로: `server/.env`
+- 설명: 서버 API 및 외부 서비스 인증키 관리
+
+### Client (Vite)
+- 경로: `.env`
+- 설명: 프론트엔드에서 사용하는 환경 변수
+- ⚠️ Vite 환경 변수 작성시 `VITE_` 접두어는 불필요
+
+# 개발 환경 실행 방법(Local Development)
 1. 네이버 CLOUD PLATFORM에서 "Papago" api 키를 받은 후 등록
 2. 공공데이터 포털 사이트에서 "기상청_단기예보 ((구)_동네예보) 조회서비스" 검색 후 API 인증키를 받은 후 등록
 3. 네이버 개발자센터에서 "쇼핑" 검색 API 키를 받은 후 등록
