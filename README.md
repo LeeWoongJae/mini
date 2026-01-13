@@ -73,3 +73,4 @@
   ![TypingWorld](image-3.png)
 
 ※ 본 프로젝트는 개인 학습 및 포트폴리오 용도로 제작되었습니다.
+※ 외부 API는 개발 종료 후 Application 삭제 처리되었습니다.
