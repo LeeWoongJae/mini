@@ -9,7 +9,6 @@ lerna-debug.log*
 
 # 환경 변수 파일
 .env
-.env.* 
 
 # 서버 설정 파일 (만약 비공개로 관리하고 싶다면)
 # server.js
